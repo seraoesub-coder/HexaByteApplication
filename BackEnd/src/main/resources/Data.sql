@@ -73,4 +73,10 @@ INSERT IGNORE INTO techniciens (nom, prenom, telephone, niveau_experience, actif
  ('Mhidi',     'Arbi',    '55420609', 2, 1),
  ('Hosni',     'Farid',   '98745600', 1, 0),
  ('Jomaaa',    'Nomeene', '32549004', 1, 1);
+
+ -- =====================================================================
+-- Hibernate 6 crée en général la colonne messages_ia.role en ENUM('USER','ASSISTANT') sur MySQL,
+-- et ddl-auto=update n'y ajoute pas la valeur SUPPORT. On la convertit en VARCHAR (idempotent).
+-- =====================================================================
+ALTER TABLE messages_ia MODIFY role VARCHAR(15) NOT NULL;
  

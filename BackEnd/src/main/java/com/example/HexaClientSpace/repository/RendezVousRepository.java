@@ -13,6 +13,8 @@ import java.util.Optional;
 
 public interface RendezVousRepository extends JpaRepository<RendezVous, Long> {
 
+    // ----- Côté client -----
+
     @Query(value = "select r from RendezVous r left join fetch r.technicien left join fetch r.reclamation "
                  + "where r.client.id = :clientId",
            countQuery = "select count(r) from RendezVous r where r.client.id = :clientId")
@@ -25,4 +27,15 @@ public interface RendezVousRepository extends JpaRepository<RendezVous, Long> {
 
     boolean existsByClientIdAndStatutAndDateHeureAfter(Long clientId, StatutRendezVous statut,
                                                        LocalDateTime apres);
+
+    // ----- Côté support -----
+
+    @Query(value = "select r from RendezVous r left join fetch r.technicien left join fetch r.reclamation "
+                 + "join fetch r.client where r.statut = :statut",
+           countQuery = "select count(r) from RendezVous r where r.statut = :statut")
+    Page<RendezVous> findByStatut(@Param("statut") StatutRendezVous statut, Pageable pageable);
+
+    @Query("select r from RendezVous r left join fetch r.technicien left join fetch r.reclamation "
+         + "join fetch r.client where r.id = :id")
+    Optional<RendezVous> findDetailById(@Param("id") Long id);
 }
