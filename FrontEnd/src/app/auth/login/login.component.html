@@ -1,0 +1,61 @@
+<div class="min-h-screen bg-gray-100 bg-transparent">
+  <div class="container mx-auto py-8">
+    <h1 class="text-4xl font-bold text-center text-white mb-8">Welcome back!</h1>
+    <br>
+
+    <div class="flex justify-center items-start">
+      <div class="w-full max-w-md bg-white p-8 rounded-lg shadow-md">
+        <h2 class="text-2xl font-semibold mb-6 text-center text-gray-900">Log in to your account</h2>
+
+        <form (ngSubmit)="onSubmit()" #LoginForm="ngForm" novalidate>
+
+          <!-- Email -->
+          <div class="mb-4">
+            <label class="block text-sm font-bold mb-1 text-black">Email *</label>
+            <input type="email" [(ngModel)]="Login_Fill.email" name="email"
+                   required email autocomplete="email"
+                   class="form-input w-full border rounded px-3 py-2 text-black bg-white"
+                   #email="ngModel" />
+            <p *ngIf="email.invalid && email.touched" class="text-red-500 text-sm">
+              A valid email address is required.
+            </p>
+          </div>
+
+          <!-- Password (motDePasse) -->
+          <div class="mb-6">
+            <label class="block text-sm font-bold mb-1 text-black">Password (Mot de passe) *</label>
+            <div class="relative">
+              <input [type]="showPassword ? 'text' : 'password'" [(ngModel)]="Login_Fill.motDePasse" name="motDePasse"
+                     required autocomplete="current-password"
+                     class="form-input w-full border rounded px-3 py-2 pr-16 text-black bg-white"
+                     #motDePasse="ngModel" />
+              <button type="button" (click)="showPassword = !showPassword"
+                      class="absolute inset-y-0 right-0 px-3 text-sm text-blue-600 hover:text-blue-800"
+                      [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'">
+                {{ showPassword ? 'Hide' : 'Show' }}
+              </button>
+            </div>
+            <p *ngIf="motDePasse.invalid && motDePasse.touched" class="text-red-500 text-sm">
+              Password is required.
+            </p>
+          </div>
+
+          <button type="submit" [disabled]="LoginForm.invalid || isLoading"
+                  class="w-full text-white py-2 rounded transition bg-blue-600 hover:bg-blue-700 disabled:opacity-50">
+            {{ isLoading ? 'Logging in...' : 'Log in' }}
+          </button>
+
+          <!-- General error -->
+          <div *ngIf="loginError" class="mt-4 text-red-600 font-semibold text-center">
+            ❌ {{ errorMessage }}
+          </div>
+
+          <p class="mt-6 text-center text-sm text-gray-700">
+            No account yet?
+            <a routerLink="/register" class="text-blue-600 hover:text-blue-800 font-semibold">Register here</a>
+          </p>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

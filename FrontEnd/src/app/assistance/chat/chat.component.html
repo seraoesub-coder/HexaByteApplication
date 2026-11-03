@@ -1,0 +1,121 @@
+<section class="w-full max-w-3xl mx-auto bg-white dark:bg-gray-900 text-black dark:text-white p-6 rounded-2xl shadow-lg my-6">
+
+  <!-- Pas de session : invitation à se connecter -->
+  <div *ngIf="!session.isLoggedIn()" class="text-center py-8">
+    <p class="mb-4">Please log in to see this conversation.</p>
+    <a routerLink="/login" class="inline-block rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">Log in</a>
+  </div>
+
+  <ng-container *ngIf="session.isLoggedIn()">
+
+    <p *ngIf="loading" class="text-center text-gray-500 py-8">Loading your conversation...</p>
+
+    <ng-container *ngIf="reclamation && !loading">
+
+      <!-- En-tête -->
+      <div class="flex flex-wrap items-start justify-between gap-2 mb-4">
+        <div>
+          <h2 class="text-xl font-semibold">Complaint {{ reclamation.reference }}</h2>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            {{ reclamation.categorieLibelle }} · {{ reclamation.sousCategorieLibelle }}
+          </p>
+        </div>
+        <span class="rounded-full px-3 py-1 text-xs font-semibold" [ngClass]="statutClasse()">
+          {{ statutLibelle() }}
+        </span>
+      </div>
+
+      <!-- Messages -->
+      <div #scroller class="max-h-96 overflow-y-auto space-y-4 rounded-lg bg-gray-50 dark:bg-gray-800 p-4">
+
+        <p *ngIf="messages.length === 0 && !aiBusy" class="text-sm text-gray-500 text-center">
+          No messages yet.
+        </p>
+
+        <div *ngFor="let m of messages" class="flex" [ngClass]="m.role === 'USER' ? 'justify-end' : 'justify-start'">
+          <div class="max-w-md md:max-w-lg">
+            <p class="text-xs text-gray-500 dark:text-gray-400 mb-1" [ngClass]="m.role === 'USER' ? 'text-right' : ''">
+              {{ roleLabel(m.role) }} · {{ m.dateCreation | date:'short' }}
+            </p>
+            <div class="rounded-2xl px-4 py-3 whitespace-pre-line" [ngClass]="bubbleClasse(m.role)">{{ m.contenu }}</div>
+
+            <!-- Note de 1 à 5 sur les réponses de l'assistant -->
+            <div *ngIf="m.role === 'ASSISTANT'" class="mt-1 flex items-center gap-1">
+              <span class="text-xs text-gray-500 dark:text-gray-400 mr-1">
+                {{ m.note === null ? 'Rate this answer:' : 'Your rating:' }}
+              </span>
+              <button *ngFor="let s of stars" type="button"
+                      [disabled]="m.note !== null || ratingId !== null"
+                      (click)="evaluer(m, s)"
+                      class="text-xl leading-none disabled:cursor-default"
+                      [ngClass]="(m.note ?? 0) >= s ? 'text-yellow-400' : 'text-gray-400 hover:text-yellow-400'"
+                      [attr.aria-label]="'Rate ' + s + ' out of 5'">★</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Message envoyé, en attente de la réponse -->
+        <div *ngIf="pendingMessage" class="flex justify-end">
+          <div class="max-w-md md:max-w-lg rounded-2xl px-4 py-3 whitespace-pre-line bg-blue-600 text-white opacity-70">{{ pendingMessage }}</div>
+        </div>
+
+        <div *ngIf="aiBusy" class="flex justify-start">
+          <div class="rounded-2xl px-4 py-3 text-sm italic bg-gray-200 dark:bg-gray-700">The assistant is typing...</div>
+        </div>
+      </div>
+
+      <!-- Démarrage manuel (si le démarrage automatique a échoué) -->
+      <div *ngIf="peutDemarrer" class="mt-4 text-center">
+        <button type="button" (click)="demarrer()" class="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
+          Start the assistant
+        </button>
+      </div>
+
+      <!-- Saisie -->
+      <form *ngIf="peutEcrire" (ngSubmit)="envoyer()" class="mt-4">
+        <textarea [(ngModel)]="draft" name="draft" rows="3" maxlength="2000" [disabled]="aiBusy"
+                  (keydown.enter)="envoyerParEntree($event)"
+                  placeholder="Write your message... (Enter to send, Shift+Enter for a new line)"
+                  class="w-full rounded border px-3 py-2 bg-white dark:bg-gray-800 dark:border-gray-600"></textarea>
+        <div class="mt-2 flex items-center justify-between">
+          <span class="text-xs text-gray-500 dark:text-gray-400">{{ draft.length }}/2000</span>
+          <button type="submit" [disabled]="aiBusy || !draft.trim()"
+                  class="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50">
+            Send
+          </button>
+        </div>
+      </form>
+
+      <!-- Conversation fermée -->
+      <p *ngIf="reclamation.statut === 'ESCALADEE_SUPPORT'" class="mt-4 text-sm text-orange-700 dark:text-orange-300">
+        A human advisor will take over. Their reply will appear in this conversation.
+      </p>
+      <p *ngIf="reclamation.statut === 'RESOLUE_PAR_IA'" class="mt-4 text-sm text-green-700 dark:text-green-300">
+        This complaint is marked as resolved.
+      </p>
+      <p *ngIf="reclamation.statut === 'CLOTUREE'" class="mt-4 text-sm text-gray-600 dark:text-gray-300">
+        This complaint is closed.
+      </p>
+
+      <!-- Actions -->
+      <div *ngIf="peutDeclarerResolue || peutEscalader" class="mt-4 flex flex-wrap gap-2">
+        <button *ngIf="peutDeclarerResolue" type="button" (click)="declarerResolue()" [disabled]="actionBusy || aiBusy"
+                class="rounded bg-green-600 px-4 py-2 text-sm text-white hover:bg-green-700 disabled:opacity-50">
+          ✅ This solved my problem
+        </button>
+        <button *ngIf="peutEscalader" type="button" (click)="escalader()" [disabled]="actionBusy || aiBusy"
+                class="rounded bg-orange-600 px-4 py-2 text-sm text-white hover:bg-orange-700 disabled:opacity-50">
+          👤 Talk to a human advisor
+        </button>
+      </div>
+
+      <div *ngIf="notice" class="mt-4 rounded-lg border border-green-300 bg-green-50 p-3 text-sm text-green-800 dark:bg-green-900/30 dark:text-green-200">
+        {{ notice }}
+      </div>
+    </ng-container>
+
+    <div *ngIf="errorMessage" class="mt-4 text-center font-semibold text-red-600">
+      ❌ {{ errorMessage }}
+    </div>
+  </ng-container>
+</section>

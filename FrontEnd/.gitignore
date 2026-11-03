@@ -1,0 +1,9 @@
+HELP.md
+node_modules
+.vscode
+.angular
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr

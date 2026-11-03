@@ -1,0 +1,132 @@
+<!-- Main Wrapper that toggles Fullscreen -->
+<div 
+  [ngClass]="{
+    'fixed inset-0 z-50 overflow-y-auto rounded-none p-6 bg-gray-100 dark:bg-gray-950': isFullScreen,
+    'container mx-auto py-6 px-4': !isFullScreen
+  }"
+  class="transition-all duration-300">
+
+  <!-- Top Header Box -->
+  <div class="w-full bg-blue-900 dark:bg-gray-900 p-6 sm:p-8 rounded-2xl shadow-lg transition-all duration-300 mb-6">
+    <div class="flex items-center justify-between text-white">
+      <div>
+        <p class="text-2xl font-bold">Home / Espace Client</p>
+        <p class="text-sm opacity-80 mt-1">Bienvenue dans votre portail de gestion Hexabyte.</p>
+      </div>
+      <div class="flex items-center gap-4">
+        <span class="text-sm font-medium">{{ currentTime }}</span>
+        
+        <!-- Fullscreen Toggle Button -->
+        <button 
+          (click)="isFullScreen = !isFullScreen" 
+          class="px-3 py-1.5 bg-white/20 hover:bg-white/30 text-white rounded-lg text-sm font-medium transition flex items-center gap-1">
+          <span>{{ isFullScreen ? 'Exit Fullscreen' : 'Fullscreen' }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Two-Column Independent Containers Section -->
+  <div class="flex flex-col lg:flex-row gap-8 items-start">
+
+    <!-- ==================== CONTAINER 1 (LEFT SIDE) ==================== -->
+    <div class="w-full lg:w-7/12 bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800 text-black dark:text-white">
+      
+      <!-- Header with Icon and Title -->
+      <div class="flex items-center gap-3 mb-6 border-b pb-4 border-gray-200 dark:border-gray-800">
+        <span class="text-3xl">🌐</span>
+        <h2 class="text-2xl font-bold text-blue-600 dark:text-blue-400">
+          À votre écoute pour vous accompagner au quotidien
+        </h2>
+      </div>
+
+      <!-- Content Text -->
+      <div class="text-lg leading-relaxed space-y-4">
+        <p>
+          Chez <strong>Hexabyte</strong>, votre satisfaction et la qualité de votre connexion sont au cœur de nos engagements. Cet espace a été spécialement conçu pour vous donner la parole : vous rencontrez un souci technique, vous avez une réclamation ou besoin d'un conseil sur vos offres (Box, ADSL, VDSL ou Fibre optique) ?
+        </p>
+        <p>
+          Nous sommes là pour vous écouter avec attention, prendre en charge vos demandes rapidement et vous orienter vers la meilleure solution. N'hésitez pas à nous faire part de vos remarques, notre équipe est à votre entière disposition pour vous guider et vous conseiller au mieux.
+        </p>
+        <p class="pt-2 text-blue-600 dark:text-blue-300 font-semibold">
+          Parce qu'une bonne connexion commence par une écoute attentive. 
+        </p>
+      
+      </div>
+
+    </div>
+    <!-- ==================== END CONTAINER 1 ==================== -->
+
+<!-- ==================== CONTAINER 2 (RIGHT SIDE) ==================== -->
+    <div class="w-full lg:w-5/12 bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800 text-black dark:text-white flex flex-col h-full">
+      
+      <!-- Section Title (Fixed at top of container) -->
+      <div class="bg-blue-600 dark:bg-gray-900 text-white p-6 rounded-xl shadow-md mb-6 shrink-0">
+        <h3 class="text-xl font-bold">💬 Témoignages & Avis Clients</h3>
+        <p class="text-sm opacity-90 mt-1">Ce que disent nos abonnés de notre service et de notre support.</p>
+      </div>
+
+      <!-- Testimonial Cards Stack with Guaranteed Scrolling -->
+      <div class="max-h-[320px] overflow-y-auto pr-3 flex flex-col gap-4">
+        
+        <!-- Advice Card 1 -->
+        <div class="bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-100 p-5 rounded-xl shadow-sm border-l-4 border-blue-500">
+          <div class="flex items-center gap-3 mb-2">
+            <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-700 font-bold flex items-center justify-center">
+              KM
+            </div>
+            <div>
+              <h4 class="font-bold text-sm">Karim M.</h4>
+              <p class="text-xs text-gray-500 dark:text-gray-400">Abonné Fibre Optique</p>
+            </div>
+          </div>
+          <p class="text-sm italic">
+            "Migration vers la fibre ultra rapide et un support technique très réactif quand j'avais des questions sur mon installation."
+          </p>
+        </div>
+
+        <!-- Advice Card 2 -->
+        <div class="bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-100 p-5 rounded-xl shadow-sm border-l-4 border-green-500">
+          <div class="flex items-center gap-3 mb-2">
+            <div class="w-10 h-10 rounded-full bg-green-100 text-green-700 font-bold flex items-center justify-center">
+              SL
+            </div>
+            <div>
+              <h4 class="font-bold text-sm">Sonia L.</h4>
+              <p class="text-xs text-gray-500 dark:text-gray-400">Cliente ADSL</p>
+            </div>
+          </div>
+          <p class="text-sm italic">
+            "J'ai pu déposer une réclamation en ligne et le problème de débit a été résolu en moins de 24h. Excellent suivi client !"
+          </p>
+        </div>
+
+        <!-- Advice Card 3 -->
+        <div class="bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-100 p-5 rounded-xl shadow-sm border-l-4 border-purple-500">
+          <div class="flex items-center gap-3 mb-2">
+            <div class="w-10 h-10 rounded-full bg-purple-100 text-purple-700 font-bold flex items-center justify-center">
+              MR
+            </div>
+            <div>
+              <h4 class="font-bold text-sm">Mehdi R.</h4>
+              <p class="text-xs text-gray-500 dark:text-gray-400">Professionnel (HexaPro)</p>
+            </div>
+          </div>
+          <p class="text-sm italic">
+            "Un accompagnement sur mesure pour notre entreprise. Les conseils de l'équipe technique nous ont permis d'optimiser notre réseau."
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+    <!-- ==================== END CONTAINER 2 ==================== -->
+  </div>
+
+  <!-- Separate Footer Section -->
+  <footer class="w-full bg-blue-900 text-white text-center py-6 mt-20 rounded-2xl shadow-lg transition-all duration-300">
+    <p class="text-xl">&copy; 2026 Hexabyte - Tous droits réservés.</p>
+  </footer>
+
+</div>
+

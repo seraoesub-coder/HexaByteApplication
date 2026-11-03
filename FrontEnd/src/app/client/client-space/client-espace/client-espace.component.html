@@ -1,0 +1,170 @@
+<div class="w-full max-w-4xl mx-auto my-6 px-4">
+
+  <!-- Pas de session : invitation à se connecter -->
+  <div *ngIf="!session.isLoggedIn()" class="rounded-2xl bg-white p-8 text-center shadow-lg text-black">
+    <p class="mb-4">Please log in to access your client space.</p>
+    <a routerLink="/login" class="inline-block rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">Log in</a>
+  </div>
+
+  <ng-container *ngIf="session.isLoggedIn()">
+
+    <!-- En-tête -->
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+      <div>
+        <h1 class="text-3xl font-bold text-white">My client space</h1>
+        <p class="text-sm text-gray-300" *ngIf="session.getUser() as user">
+          Welcome<span *ngIf="user.nomComplet">, {{ user.nomComplet }}</span>
+          <span *ngIf="user.numeroClient"> · Client n° {{ user.numeroClient }}</span>
+        </p>
+      </div>
+      <button type="button" (click)="logout()"
+              class="rounded border border-white px-4 py-2 text-sm text-white hover:bg-white hover:text-gray-900">
+        Log out
+      </button>
+    </div>
+
+    <!-- ===================== Mes informations ===================== -->
+    <section class="mb-6 rounded-2xl bg-white p-6 text-black shadow-lg dark:bg-gray-900 dark:text-white">
+      <div class="mb-4 flex items-center justify-between">
+        <h2 class="text-xl font-semibold">My information</h2>
+        <button *ngIf="profile && !editing" type="button" (click)="startEdit()"
+                class="rounded bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700">
+          Edit
+        </button>
+      </div>
+
+      <p *ngIf="loadingProfile" class="text-gray-500">Loading...</p>
+
+      <ng-container *ngIf="profile as p">
+
+        <!-- Lecture -->
+        <dl *ngIf="!editing" class="grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2">
+          <div><dt class="text-xs text-gray-500">Last name</dt><dd class="font-medium">{{ p.nom }}</dd></div>
+          <div><dt class="text-xs text-gray-500">First name</dt><dd class="font-medium">{{ p.prenom }}</dd></div>
+          <div><dt class="text-xs text-gray-500">Email</dt><dd class="font-medium">{{ p.email }}</dd></div>
+          <div><dt class="text-xs text-gray-500">Client number</dt><dd class="font-medium">{{ p.numeroClient }}</dd></div>
+          <div><dt class="text-xs text-gray-500">Phone</dt><dd class="font-medium">{{ p.telephone || '—' }}</dd></div>
+          <div><dt class="text-xs text-gray-500">Governorate</dt><dd class="font-medium">{{ p.gouvernorat || '—' }}</dd></div>
+          <div class="sm:col-span-2">
+            <dt class="text-xs text-gray-500">Installation address</dt>
+            <dd class="font-medium">{{ p.adresseInstallation || '—' }}</dd>
+          </div>
+        </dl>
+
+        <!-- Modification (PATCH) -->
+        <form *ngIf="editing" (ngSubmit)="save()" novalidate>
+          <p class="mb-4 text-xs text-gray-500">
+            Name and email cannot be changed here. Only the fields below can be updated.
+          </p>
+
+          <div class="mb-4">
+            <label for="telephone" class="mb-1 block text-sm font-bold">Phone number</label>
+            <input id="telephone" type="text" name="telephone" [(ngModel)]="form.telephone"
+                   placeholder="e.g., 98123456 or +21698123456" autocomplete="tel"
+                   class="w-full rounded border bg-white px-3 py-2 text-black dark:border-gray-600 dark:bg-gray-800 dark:text-white" />
+            <p *ngIf="formErrors['telephone']" class="text-sm text-red-500">{{ formErrors['telephone'] }}</p>
+          </div>
+
+          <div class="mb-4">
+            <label for="adresse" class="mb-1 block text-sm font-bold">Installation address</label>
+            <input id="adresse" type="text" name="adresseInstallation" [(ngModel)]="form.adresseInstallation"
+                   maxlength="255" autocomplete="street-address"
+                   class="w-full rounded border bg-white px-3 py-2 text-black dark:border-gray-600 dark:bg-gray-800 dark:text-white" />
+            <p *ngIf="formErrors['adresseInstallation']" class="text-sm text-red-500">{{ formErrors['adresseInstallation'] }}</p>
+          </div>
+
+          <div class="mb-4">
+            <label for="gouvernorat" class="mb-1 block text-sm font-bold">Governorate</label>
+            <select id="gouvernorat" name="gouvernorat" [(ngModel)]="form.gouvernorat"
+                    class="w-full rounded border bg-white px-3 py-2 text-black dark:border-gray-600 dark:bg-gray-800 dark:text-white">
+              <option value="" disabled>Select your governorate...</option>
+              <option *ngFor="let g of gouvernorats" [value]="g">{{ g }}</option>
+            </select>
+          </div>
+
+          <div class="flex gap-2">
+            <button type="submit" [disabled]="saving"
+                    class="rounded bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700 disabled:opacity-50">
+              {{ saving ? 'Saving...' : 'Save changes' }}
+            </button>
+            <button type="button" (click)="cancelEdit()" [disabled]="saving"
+                    class="rounded border px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-800">
+              Cancel
+            </button>
+          </div>
+        </form>
+      </ng-container>
+
+      <p *ngIf="profileNotice" class="mt-4 rounded-lg border border-green-300 bg-green-50 p-3 text-sm text-green-800">
+        ✅ {{ profileNotice }}
+      </p>
+      <p *ngIf="profileError" class="mt-4 text-center font-semibold text-red-600">❌ {{ profileError }}</p>
+    </section>
+
+    <!-- ===================== Mes réclamations ===================== -->
+    <section class="rounded-2xl bg-white p-6 text-black shadow-lg dark:bg-gray-900 dark:text-white">
+      <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
+        <h2 class="text-xl font-semibold">My complaints</h2>
+        <a routerLink="/reclamations/new" class="rounded bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700">
+          + New complaint
+        </a>
+      </div>
+
+      <!-- Recherche et filtre -->
+      <div *ngIf="reclamations.length > 0" class="mb-4 flex flex-wrap gap-2">
+        <input type="search" [(ngModel)]="search" (ngModelChange)="onFiltreChange()"
+               placeholder="Search by reference, category or description..."
+               class="min-w-0 flex-1 rounded border bg-white px-3 py-2 text-sm text-black dark:border-gray-600 dark:bg-gray-800 dark:text-white" />
+        <select [(ngModel)]="statutFiltre" (ngModelChange)="onFiltreChange()"
+                class="rounded border bg-white px-3 py-2 text-sm text-black dark:border-gray-600 dark:bg-gray-800 dark:text-white">
+          <option *ngFor="let s of statuts" [value]="s.value">{{ s.label }}</option>
+        </select>
+      </div>
+
+      <p *ngIf="loadingReclamations" class="text-gray-500">Loading...</p>
+
+      <p *ngIf="!loadingReclamations && !reclamationsError && reclamations.length === 0" class="py-6 text-center text-gray-500">
+        You have no complaint yet.
+      </p>
+      <p *ngIf="reclamations.length > 0 && filtrees.length === 0" class="py-6 text-center text-gray-500">
+        No complaint matches your search.
+      </p>
+
+      <ul *ngIf="pageCourante.length > 0" class="divide-y divide-gray-200 dark:divide-gray-700">
+        <li *ngFor="let r of pageCourante" class="flex flex-wrap items-center justify-between gap-3 py-3">
+          <div class="min-w-0">
+            <p class="font-semibold">
+              {{ r.reference }}
+              <span *ngIf="r.priorite === 'HAUTE'" class="ml-2 rounded bg-red-100 px-2 py-0.5 text-xs text-red-700">High priority</span>
+            </p>
+            <p class="text-sm text-gray-500 dark:text-gray-400">{{ r.categorieLibelle }} · {{ r.sousCategorieLibelle }}</p>
+            <p class="text-xs text-gray-400">{{ r.dateCreation | date:'medium' }}</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="rounded-full px-3 py-1 text-xs font-semibold" [ngClass]="statutClasse(r.statut)">
+              {{ statutLibelle(r.statut) }}
+            </span>
+            <a [routerLink]="['/reclamations', r.id, 'chat']"
+               class="rounded border border-blue-600 px-3 py-1 text-sm text-blue-600 hover:bg-blue-600 hover:text-white">
+              Open
+            </a>
+          </div>
+        </li>
+      </ul>
+
+      <!-- Pagination -->
+      <div *ngIf="filtrees.length > pageSize" class="mt-4 flex items-center justify-between text-sm">
+        <button type="button" (click)="pagePrecedente()" [disabled]="page === 0"
+                class="rounded border px-3 py-1 disabled:opacity-50">← Previous</button>
+        <span>Page {{ page + 1 }} / {{ totalPages }}</span>
+        <button type="button" (click)="pageSuivante()" [disabled]="page >= totalPages - 1"
+                class="rounded border px-3 py-1 disabled:opacity-50">Next →</button>
+      </div>
+
+      <p *ngIf="totalReclamations > reclamations.length" class="mt-3 text-xs text-gray-500">
+        Showing your {{ reclamations.length }} most recent complaints out of {{ totalReclamations }}.
+      </p>
+      <p *ngIf="reclamationsError" class="mt-4 text-center font-semibold text-red-600">❌ {{ reclamationsError }}</p>
+    </section>
+  </ng-container>
+</div>

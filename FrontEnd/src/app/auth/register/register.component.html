@@ -1,0 +1,135 @@
+<div class="min-h-screen bg-gray-100 bg-transparent">
+  <div class="container mx-auto py-8">
+    <h1 class="text-4xl font-bold text-center text-white mb-8">To Client Registration Menu!</h1>
+    <br>
+
+    <div class="flex justify-center items-start">
+      <div class="w-full max-w-2xl bg-white p-8 rounded-lg shadow-md">
+        <h2 class="text-2xl font-semibold mb-6 text-center text-gray-900">Register New Client</h2>
+        <form (ngSubmit)="onSubmit()" #ClientForm="ngForm" novalidate>
+
+          <!-- First Name (prenom) -->
+          <div class="mb-4">
+            <label class="block text-sm font-bold mb-1 text-black">First Name (Prénom) *</label>
+            <input type="text" [(ngModel)]="Client_Fill.prenom" name="prenom"
+                   required minlength="2" class="form-input w-full border rounded px-3 py-2 text-black bg-white"
+                   #prenom="ngModel" />
+            <p *ngIf="prenom.invalid && prenom.touched" class="text-red-500 text-sm">
+              First name is required (min 2 characters).
+            </p>
+            <p *ngIf="fieldErrors['prenom']" class="text-red-500 text-sm">
+              {{ fieldErrors['prenom'] }}
+            </p>
+          </div>
+
+          <!-- Last Name (nom) -->
+          <div class="mb-4">
+            <label class="block text-sm font-bold mb-1 text-black">Last Name (Nom) *</label>
+            <input type="text" [(ngModel)]="Client_Fill.nom" name="nom"
+                   required minlength="2" class="form-input w-full border rounded px-3 py-2 text-black bg-white"
+                   #nom="ngModel" />
+            <p *ngIf="nom.invalid && nom.touched" class="text-red-500 text-sm">
+              Last name is required (min 2 characters).
+            </p>
+            <p *ngIf="fieldErrors['nom']" class="text-red-500 text-sm">
+              {{ fieldErrors['nom'] }}
+            </p>
+          </div>
+
+          <!-- Email -->
+          <div class="mb-4">
+            <label class="block text-sm font-bold mb-1 text-black">Email *</label>
+            <input type="email" [(ngModel)]="Client_Fill.email" name="email"
+                   required email class="form-input w-full border rounded px-3 py-2 text-black bg-white"
+                   #email="ngModel" />
+            <p *ngIf="email.invalid && email.touched" class="text-red-500 text-sm">
+              A valid email address is required.
+            </p>
+            <p *ngIf="fieldErrors['email']" class="text-red-500 text-sm">
+              {{ fieldErrors['email'] }}
+            </p>
+          </div>
+
+          <!-- Phone Number (telephone) -->
+          <div class="mb-4">
+            <label class="block text-sm font-bold mb-1 text-black">Phone Number (Téléphone)</label>
+            <input type="text" [(ngModel)]="Client_Fill.telephone" name="telephone"
+                   pattern="^(?:\+216)?[0-9]{8}$" class="form-input w-full border rounded px-3 py-2 text-black bg-white"
+                   #telephone="ngModel" placeholder="e.g., 98123456 or +21698123456" />
+            <p *ngIf="telephone.invalid && telephone.touched" class="text-red-500 text-sm">
+              Phone number must be 8 digits (with optional +216).
+            </p>
+            <p *ngIf="fieldErrors['telephone']" class="text-red-500 text-sm">
+              {{ fieldErrors['telephone'] }}
+            </p>
+          </div>
+
+          <!-- Installation Address (adresseInstallation) -->
+          <div class="mb-4">
+            <label class="block text-sm font-bold mb-1 text-black">Installation Address (Adresse d'installation)</label>
+            <input type="text" [(ngModel)]="Client_Fill.adresseInstallation" name="adresseInstallation"
+                   class="form-input w-full border rounded px-3 py-2 text-black bg-white" />
+          </div>
+
+          <!-- Gouvernorat -->
+          <div class="mb-4">
+            <label class="block text-sm font-bold mb-1 text-black">Gouvernorat</label>
+            <select [(ngModel)]="Client_Fill.gouvernorat" name="gouvernorat"
+                    class="form-select w-full border rounded px-3 py-2 text-black bg-white">
+              <option value="" disabled selected>Select gouvernorat...</option>
+              <option *ngFor="let g of gouvernorats" [value]="g">{{ g }}</option>
+            </select>
+          </div>
+
+          <!-- Password (motDePasse) -->
+          <div class="mb-6">
+            <label class="block text-sm font-bold mb-1 text-black">Password (Mot de passe) *</label>
+            <input type="password" [(ngModel)]="Client_Fill.motDePasse" (input)="checkPasswordStrength()"
+                   name="motDePasse" required minlength="8"
+                   pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
+                   class="form-input w-full border rounded px-3 py-2 text-black bg-white" #motDePasse="ngModel" />
+
+            <p *ngIf="motDePasse.invalid && motDePasse.touched && motDePasse.errors?.['required']" class="text-red-500 text-sm">
+              Password is required.
+            </p>
+            <p *ngIf="motDePasse.invalid && motDePasse.touched && motDePasse.errors?.['minlength']" class="text-red-500 text-sm">
+              Password must be at least 8 characters.
+            </p>
+            <p *ngIf="motDePasse.invalid && motDePasse.touched && motDePasse.errors?.['pattern']" class="text-red-500 text-sm">
+              Must contain 1 uppercase, 1 lowercase, 1 number, and 1 special character.
+            </p>
+            <p *ngIf="fieldErrors['motDePasse']" class="text-red-500 text-sm">
+              {{ fieldErrors['motDePasse'] }}
+            </p>
+            <p *ngIf="passwordStrength" class="text-sm mt-1 text-black">
+              Strength: <span [ngClass]="getPasswordStrengthClass()">{{ passwordStrength }}</span>
+            </p>
+          </div>
+
+          <!-- Confirm Password -->
+          <div class="mb-6">
+            <label class="block text-sm font-bold mb-1 text-black">Repeat Password *</label>
+            <input type="password" [(ngModel)]="Client_Fill.confirmPassword" name="confirmPassword"
+                   required class="form-input w-full border rounded px-3 py-2 text-black bg-white" #confirmPassword="ngModel" />
+            <p *ngIf="Client_Fill.motDePasse !== Client_Fill.confirmPassword && confirmPassword.touched" class="text-red-500 text-sm">
+              Passwords do not match.
+            </p>
+          </div>
+
+          <button type="submit" [disabled]="ClientForm.invalid || isLoading"
+                  class="w-full text-white py-2 rounded transition bg-blue-600 hover:bg-blue-700 disabled:opacity-50">
+            {{ isLoading ? 'Registering...' : 'Register' }}
+          </button>
+
+          <!-- General Error / Success Messages -->
+          <div *ngIf="registrationSuccess" class="mt-4 text-green-600 font-semibold text-center">
+            ✅ Client added successfully!
+          </div>
+          <div *ngIf="registrationError" class="mt-4 text-red-600 font-semibold text-center">
+            ❌ {{ errorMessage }}
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

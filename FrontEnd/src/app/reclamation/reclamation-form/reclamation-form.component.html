@@ -1,0 +1,79 @@
+<section class="w-full max-w-2xl mx-auto bg-white dark:bg-gray-900 text-black dark:text-white p-8 rounded-2xl shadow-lg my-6">
+
+  <a routerLink="/dashboard" class="mb-4 inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800">
+  ← Back to my space
+</a>
+
+  <h2 class="text-2xl font-semibold mb-1">File a complaint</h2>
+  <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">
+    Choose the type of problem and describe it. Our assistant will help you right away.
+  </p>
+
+  <p *ngIf="!session.isLoggedIn()" class="mb-4 rounded bg-yellow-100 px-4 py-2 text-sm text-yellow-800">
+    Please log in to file a complaint.
+  </p>
+
+  <form (ngSubmit)="onSubmit(reclamationForm)" #reclamationForm="ngForm" novalidate>
+
+    <!-- Category -->
+    <div class="mb-4">
+      <label for="categorie" class="block text-sm font-bold mb-1">Category *</label>
+      <select id="categorie" name="categorieId" required
+              [(ngModel)]="categorieId" (ngModelChange)="onCategorieChange()" #categorie="ngModel"
+              class="w-full rounded border px-3 py-2 bg-white dark:bg-gray-800 dark:border-gray-600">
+        <option [ngValue]="null" disabled>{{ loadingCategories ? 'Loading...' : 'Select a category...' }}</option>
+        <option *ngFor="let c of categories" [ngValue]="c.id">{{ c.libelle }}</option>
+      </select>
+      <p *ngIf="categorie.invalid && categorie.touched" class="text-red-500 text-sm">Please select a category.</p>
+    </div>
+
+    <!-- Specific problem (depends on the category) -->
+    <div class="mb-4">
+      <label for="sousCategorie" class="block text-sm font-bold mb-1">Specific problem *</label>
+      <select id="sousCategorie" name="sousCategorieId" required
+              [(ngModel)]="sousCategorieId" [disabled]="!categorieId" #sousCategorie="ngModel"
+              class="w-full rounded border px-3 py-2 bg-white dark:bg-gray-800 dark:border-gray-600 disabled:opacity-60">
+        <option [ngValue]="null" disabled>{{ categorieId ? 'Select the problem...' : 'Choose a category first' }}</option>
+        <option *ngFor="let s of sousCategories" [ngValue]="s.id">{{ s.libelle }}</option>
+      </select>
+      <p *ngIf="sousCategorie.invalid && sousCategorie.touched" class="text-red-500 text-sm">Please select the problem.</p>
+      <p *ngIf="fieldErrors['sousCategorieId']" class="text-red-500 text-sm">{{ fieldErrors['sousCategorieId'] }}</p>
+    </div>
+
+    <!-- Description -->
+    <div class="mb-4">
+      <label for="description" class="block text-sm font-bold mb-1">Describe your problem *</label>
+      <textarea id="description" name="description" rows="5" required minlength="10" maxlength="2000"
+                [(ngModel)]="description" #desc="ngModel"
+                placeholder="Example: the WIFI signal drops every evening around 8 pm in the living room."
+                class="w-full rounded border px-3 py-2 bg-white dark:bg-gray-800 dark:border-gray-600"></textarea>
+      <div class="flex justify-between text-xs mt-1">
+        <span *ngIf="desc.invalid && desc.touched" class="text-red-500 text-sm">Please write at least 10 characters.</span>
+        <span *ngIf="fieldErrors['description']" class="text-red-500 text-sm">{{ fieldErrors['description'] }}</span>
+        <span class="ml-auto text-gray-500 dark:text-gray-400">{{ description.length }}/2000</span>
+      </div>
+    </div>
+
+    <button type="submit"
+            [disabled]="reclamationForm.invalid || loading || !session.isLoggedIn()"
+            class="w-full text-white py-2 rounded transition bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">
+      {{ loading ? 'Sending...' : 'Submit complaint' }}
+    </button>
+  </form>
+
+  <!-- Result -->
+  <div *ngIf="reclamationCreee" class="mt-6 rounded-lg bg-green-50 dark:bg-green-900/30 border border-green-300 p-4 text-green-800 dark:text-green-200">
+    <p class="font-semibold">✅ Your complaint has been registered.</p>
+    <p class="text-sm mt-1">Reference: <strong>{{ reclamationCreee.reference }}</strong></p>
+    <p class="text-sm">{{ reclamationCreee.categorieLibelle }} · {{ reclamationCreee.sousCategorieLibelle }}</p>
+    <p class="text-sm">Status: {{ reclamationCreee.statut }}</p>
+    <a [routerLink]="['/reclamations', reclamationCreee.id, 'chat']"
+   class="inline-block mt-3 rounded bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700">
+  Talk to the assistant
+   </a>
+  </div>
+
+  <div *ngIf="errorMessage" class="mt-4 text-red-600 font-semibold text-center">
+    ❌ {{ errorMessage }}
+  </div>
+</section>
