@@ -2,6 +2,8 @@ package com.example.HexaClientSpace.repository;
 
 import com.example.HexaClientSpace.entity.StatutRendezVous;
 import com.example.HexaClientSpace.entity.Technicien;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -21,4 +23,13 @@ public interface TechnicienRepository extends JpaRepository<Technicien, Long> {
     default List<Technicien> disponiblesLe(LocalDateTime dateHeure) {
         return findDisponibles(dateHeure, StatutRendezVous.CONFIRME);
     }
+
+    // ----- Gestion par l'administrateur -----
+
+    Page<Technicien> findByActif(boolean actif, Pageable pageable);
+
+    boolean existsByTelephone(String telephone);
+
+    /** Pour la modification : le numéro peut rester celui du technicien lui-même. */
+    boolean existsByTelephoneAndIdNot(String telephone, Long id);
 }

@@ -11,5 +11,11 @@ public record CreateReclamationRequest(
 
         @NotBlank(message = "La description est obligatoire")
         @Size(min = 10, max = 2000, message = "La description doit contenir entre 10 et 2000 caractères")
-        String description
+        String description,
+
+        /**
+         * Facultatif. true = demande urgente : la réclamation est créée en priorité HAUTE et transmise
+         * directement à un conseiller humain, sans passer par l'agent IA.
+         */
+        Boolean urgent
 ) {}

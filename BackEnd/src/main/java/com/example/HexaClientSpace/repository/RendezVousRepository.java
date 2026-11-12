@@ -38,4 +38,7 @@ public interface RendezVousRepository extends JpaRepository<RendezVous, Long> {
     @Query("select r from RendezVous r left join fetch r.technicien left join fetch r.reclamation "
          + "join fetch r.client where r.id = :id")
     Optional<RendezVous> findDetailById(@Param("id") Long id);
+
+    /** Sert à refuser la suppression d'un technicien qui a un historique de rendez-vous. */
+    boolean existsByTechnicienId(Long technicienId);
 }

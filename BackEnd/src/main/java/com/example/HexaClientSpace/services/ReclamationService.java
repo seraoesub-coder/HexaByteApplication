@@ -4,6 +4,7 @@ import com.example.HexaClientSpace.dto.CreateReclamationRequest;
 import com.example.HexaClientSpace.dto.HistoriqueStatutResponse;
 import com.example.HexaClientSpace.dto.ReclamationResponse;
 import com.example.HexaClientSpace.entity.ActeurStatut;
+import com.example.HexaClientSpace.entity.PrioriteReclamation;
 import com.example.HexaClientSpace.entity.Client;
 import com.example.HexaClientSpace.entity.Reclamation;
 import com.example.HexaClientSpace.entity.SousCategorie;
@@ -20,10 +21,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Year;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
 public class ReclamationService {
+
+    /** Plafond de réclamations urgentes en cours par client : évite qu'« urgent » devienne la norme. */
+    private static final int MAX_URGENTES_EN_COURS = 2;
+    private static final Set<StatutReclamation> STATUTS_EN_COURS = Set.of(
+            StatutReclamation.OUVERTE, StatutReclamation.EN_COURS_IA, StatutReclamation.ESCALADEE_SUPPORT);
 
     private final ReclamationRepository reclamationRepository;
     private final SousCategorieRepository sousCategorieRepository;
@@ -47,6 +54,13 @@ public class ReclamationService {
     public ReclamationResponse creer(Long userId, CreateReclamationRequest request) {
         Client client = trouverClient(userId);
 
+        boolean urgente = Boolean.TRUE.equals(request.urgent());
+        if (urgente && reclamationRepository.countByClientIdAndPrioriteAndStatutIn(
+                client.getId(), PrioriteReclamation.HAUTE, STATUTS_EN_COURS) >= MAX_URGENTES_EN_COURS) {
+            throw new IllegalStateException("Vous avez déjà " + MAX_URGENTES_EN_COURS
+                    + " réclamations urgentes en cours. Attendez leur traitement, ou déposez celle-ci sans l'indiquer comme urgente.");
+        }
+
         SousCategorie sousCategorie = sousCategorieRepository.findById(request.sousCategorieId())
                 .filter(SousCategorie::isActif)
                 .filter(sc -> sc.getCategorie().isActif())
@@ -64,6 +78,13 @@ public class ReclamationService {
         Reclamation saved = reclamationRepository.save(reclamation);
         saved.setReference(String.format("REC-%d-%06d", Year.now().getValue(), saved.getId()));
         statutService.enregistrerCreation(saved);
+
+        if (urgente) {
+            // Priorité HAUTE et transmission directe à un humain : l'agent IA est court-circuité.
+            saved.setPriorite(PrioriteReclamation.HAUTE);
+            statutService.changer(saved, StatutReclamation.ESCALADEE_SUPPORT, ActeurStatut.CLIENT,
+                    "Demande urgente : transmise directement à un conseiller humain.");
+        }
 
         return ReclamationResponse.from(saved);
     }

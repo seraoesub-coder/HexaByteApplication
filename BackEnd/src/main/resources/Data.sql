@@ -69,14 +69,27 @@ INSERT IGNORE INTO techniciens (nom, prenom, telephone, niveau_experience, actif
  ('Chebbi',    'Rania',   '52111005', 4, 1),
  ('Haddad',    'Anis',    '55111006', 1, 1),
  ('Bouaziz',   'Ines',    '95111007', 3, 1),
- ('Khelifi',   'Slim',    '27547896', 5, 1),
- ('Mhidi',     'Arbi',    '55420609', 2, 1),
- ('Hosni',     'Farid',   '98745600', 1, 0),
- ('Jomaaa',    'Nomeene', '32549004', 1, 1);
+ ('Khelifi',   'Slim',    '98111008', 5, 1);
 
- -- =====================================================================
+-- =====================================================================
 -- Hibernate 6 crée en général la colonne messages_ia.role en ENUM('USER','ASSISTANT') sur MySQL,
 -- et ddl-auto=update n'y ajoute pas la valeur SUPPORT. On la convertit en VARCHAR (idempotent).
 -- =====================================================================
 ALTER TABLE messages_ia MODIFY role VARCHAR(15) NOT NULL;
- 
+
+-- =====================================================================
+-- Catégorie pour les réclamations concernant l'application elle-même, le support ou un technicien.
+-- "Autre problème" passe en dernière position (idempotent).
+-- =====================================================================
+INSERT IGNORE INTO categories (code, libelle, description, ordre, actif) VALUES
+ ('APPLICATION', 'Problème avec l''application ou mon compte', 'Connexion, dysfonctionnement, compte, réclamation concernant le support ou un technicien', 5, 1);
+UPDATE categories SET ordre = 6 WHERE code = 'AUTRE';
+
+INSERT IGNORE INTO sous_categories (code, libelle, ordre, actif, categorie_id)
+SELECT 'APP_CONNEXION', 'Impossible de me connecter', 1, 1, id FROM categories WHERE code = 'APPLICATION';
+INSERT IGNORE INTO sous_categories (code, libelle, ordre, actif, categorie_id)
+SELECT 'APP_BUG', 'Dysfonctionnement de l''application', 2, 1, id FROM categories WHERE code = 'APPLICATION';
+INSERT IGNORE INTO sous_categories (code, libelle, ordre, actif, categorie_id)
+SELECT 'APP_COMPTE', 'Problème avec mon compte ou mes données', 3, 1, id FROM categories WHERE code = 'APPLICATION';
+INSERT IGNORE INTO sous_categories (code, libelle, ordre, actif, categorie_id)
+SELECT 'APP_PERSONNEL', 'Réclamation concernant le support ou un technicien', 4, 1, id FROM categories WHERE code = 'APPLICATION';

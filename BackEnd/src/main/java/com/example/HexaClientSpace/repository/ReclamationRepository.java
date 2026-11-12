@@ -1,5 +1,6 @@
 package com.example.HexaClientSpace.repository;
 
+import com.example.HexaClientSpace.entity.PrioriteReclamation;
 import com.example.HexaClientSpace.entity.Reclamation;
 import com.example.HexaClientSpace.entity.StatutReclamation;
 import org.springframework.data.domain.Page;
@@ -8,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Collection;
 import java.util.Optional;
 
 public interface ReclamationRepository extends JpaRepository<Reclamation, Long> {
@@ -27,11 +29,19 @@ public interface ReclamationRepository extends JpaRepository<Reclamation, Long> 
     // ----- Côté support (accès à toutes les réclamations, réservé aux routes /api/support/**) -----
 
     @Query(value = "select r from Reclamation r join fetch r.sousCategorie s join fetch s.categorie "
-                 + "join fetch r.client where r.statut = :statut",
+                 + "join fetch r.client where r.statut = :statut "
+                 + "order by case r.priorite "
+                 + "when com.example.HexaClientSpace.entity.PrioriteReclamation.HAUTE then 0 "
+                 + "when com.example.HexaClientSpace.entity.PrioriteReclamation.NORMALE then 1 "
+                 + "else 2 end, r.dateMiseAJour asc",
            countQuery = "select count(r) from Reclamation r where r.statut = :statut")
     Page<Reclamation> findByStatut(@Param("statut") StatutReclamation statut, Pageable pageable);
 
     @Query("select r from Reclamation r join fetch r.sousCategorie s join fetch s.categorie "
          + "join fetch r.client where r.id = :id")
     Optional<Reclamation> findDetailById(@Param("id") Long id);
+
+    /** Sert au plafond de réclamations urgentes en cours par client (anti-abus). */
+    long countByClientIdAndPrioriteAndStatutIn(Long clientId, PrioriteReclamation priorite,
+                                               Collection<StatutReclamation> statuts);
 }

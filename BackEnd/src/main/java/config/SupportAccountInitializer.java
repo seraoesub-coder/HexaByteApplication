@@ -11,8 +11,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 /**
- * Crée un compte AGENT_SUPPORT au démarrage si SUPPORT_EMAIL et SUPPORT_PASSWORD sont définis
- * (fichier .env). L'inscription publique ne peut JAMAIS produire ce rôle : elle crée toujours un CLIENT.
+ * Crée au démarrage un compte AGENT_SUPPORT et un compte ADMIN si leurs identifiants sont définis
+ * dans le fichier .env (SUPPORT_EMAIL / SUPPORT_PASSWORD, ADMIN_EMAIL / ADMIN_PASSWORD).
+ * L'inscription publique ne peut JAMAIS produire ces rôles : elle crée toujours un CLIENT.
  * Aucun mot de passe n'est écrit dans le code ni dans le SQL.
  */
 @Component
@@ -24,10 +25,16 @@ public class SupportAccountInitializer implements CommandLineRunner {
     private final PasswordEncoder passwordEncoder;
 
     @Value("${app.support.email:}")
-    private String email;
+    private String supportEmail;
 
     @Value("${app.support.password:}")
-    private String password;
+    private String supportPassword;
+
+    @Value("${app.admin.email:}")
+    private String adminEmail;
+
+    @Value("${app.admin.password:}")
+    private String adminPassword;
 
     public SupportAccountInitializer(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
@@ -36,27 +43,33 @@ public class SupportAccountInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        if (email.isBlank() || password.isBlank()) {
-            log.info("Aucun compte support à créer (SUPPORT_EMAIL / SUPPORT_PASSWORD non définis).");
+        creerSiAbsent(supportEmail, supportPassword, Role.AGENT_SUPPORT, "support", "SUPPORT");
+        creerSiAbsent(adminEmail, adminPassword, Role.ADMIN, "administrateur", "ADMIN");
+    }
+
+    private void creerSiAbsent(String email, String motDePasse, Role role, String libelle, String prefixeVariable) {
+        if (email.isBlank() || motDePasse.isBlank()) {
+            log.info("Aucun compte {} à créer ({}_EMAIL / {}_PASSWORD non définis).",
+                    libelle, prefixeVariable, prefixeVariable);
             return;
         }
-        if (password.length() < 8) {
-            log.warn("SUPPORT_PASSWORD trop court (8 caractères minimum) : compte support non créé.");
+        if (motDePasse.length() < 8) {
+            log.warn("{}_PASSWORD trop court (8 caractères minimum) : compte {} non créé.", prefixeVariable, libelle);
             return;
         }
 
         String mail = email.trim().toLowerCase();
         if (userRepository.existsByEmail(mail)) {
-            log.info("Un compte existe déjà pour {} : aucun compte support créé.", mail);
+            log.info("Un compte existe déjà pour {} : aucun compte {} créé.", mail, libelle);
             return;
         }
 
-        User agent = new User();
-        agent.setEmail(mail);
-        agent.setMotDePasse(passwordEncoder.encode(password));
-        agent.setRole(Role.AGENT_SUPPORT);
-        agent.setActif(true);
-        userRepository.save(agent);
-        log.info("Compte support créé : {}", mail);
+        User compte = new User();
+        compte.setEmail(mail);
+        compte.setMotDePasse(passwordEncoder.encode(motDePasse));
+        compte.setRole(role);
+        compte.setActif(true);
+        userRepository.save(compte);
+        log.info("Compte {} créé : {}", libelle, mail);
     }
 }
