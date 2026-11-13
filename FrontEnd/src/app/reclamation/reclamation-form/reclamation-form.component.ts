@@ -2,6 +2,7 @@ import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Router, RouterLink } from '@angular/router';
 
 import { Categorie, SousCategorie } from '../../categorie/categorie.model';
 import { CategorieService } from '../../categorie/categorie.service';
@@ -9,13 +10,12 @@ import { SessionService } from '../../core/services/session.service';
 import { toApiError } from '../../core/utils/api-error.util';
 import { Reclamation } from '../reclamation.model';
 import { ReclamationService } from '../reclamation.service';
-import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-reclamation-form',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
-  templateUrl: './reclamation-form.component.html'
+  templateUrl: './reclamation-form.component.html',
 })
 export class ReclamationFormComponent implements OnInit {
 
@@ -26,6 +26,7 @@ export class ReclamationFormComponent implements OnInit {
   categorieId: number | null = null;
   sousCategorieId: number | null = null;
   description = '';
+  urgent = false;                      // true = priorité haute, transmise directement à un humain
 
   loadingCategories = true;
   loading = false;
@@ -37,6 +38,7 @@ export class ReclamationFormComponent implements OnInit {
     private categorieService: CategorieService,
     private reclamationService: ReclamationService,
     public session: SessionService,
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -65,7 +67,7 @@ export class ReclamationFormComponent implements OnInit {
 
     if (form.invalid || this.sousCategorieId === null || this.loading) { return; }
     if (!this.session.isLoggedIn()) {
-      this.errorMessage = 'Your session has expired. Please log in again.';
+      this.redirigerVersConnexion();
       return;
     }
 
@@ -73,6 +75,7 @@ export class ReclamationFormComponent implements OnInit {
     this.reclamationService.creer({
       sousCategorieId: this.sousCategorieId,
       description: this.description.trim(),
+      urgent: this.urgent ? true : undefined,
     }).subscribe({
       next: (reclamation) => {
         this.loading = false;
@@ -82,6 +85,12 @@ export class ReclamationFormComponent implements OnInit {
       },
       error: (err: HttpErrorResponse) => {
         this.loading = false;
+        // Session expirée pendant la saisie : retour à la connexion.
+        if (err.status === 403 && !this.session.isLoggedIn()) {
+          this.redirigerVersConnexion();
+          return;
+        }
+        // Ex. 409 : plafond de réclamations urgentes atteint (le message vient du serveur).
         const apiError = toApiError(err);
         this.errorMessage = apiError.message;
         this.fieldErrors = apiError.fieldErrors;
@@ -89,10 +98,15 @@ export class ReclamationFormComponent implements OnInit {
     });
   }
 
+  private redirigerVersConnexion(): void {
+    this.router.navigate(['/login'], { queryParams: { returnUrl: this.router.url } });
+  }
+
   private reinitialiser(form: NgForm): void {
     form.resetForm({ categorieId: null, sousCategorieId: null, description: '' });
     this.categorieId = null;
     this.sousCategorieId = null;
     this.description = '';
+    this.urgent = false;
   }
 }

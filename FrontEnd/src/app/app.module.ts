@@ -50,6 +50,7 @@ import { ArchiveIconComponent } from './dashboard/icons/archive-icon/archive-ico
 import { SettingsIconComponent } from './dashboard/icons/settings-icon/settings-icon.component';
 import { DocIconComponent } from './dashboard/icons/doc-icon/doc-icon.component';
 import { ClientEspaceComponent } from './client-espace/client-espace/client-espace.component';
+import { RendezVousListComponent } from './rendez-vous/rendez-vous-list/rendez-vous-list.component';
 
 
 
@@ -97,6 +98,7 @@ import { ClientEspaceComponent } from './client-espace/client-espace/client-espa
     RegisterComponent,
     LoginComponent,
     ClientEspaceComponent,
+    RendezVousListComponent,
 
 
 

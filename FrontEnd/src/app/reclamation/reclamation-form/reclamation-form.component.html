@@ -1,8 +1,8 @@
 <section class="w-full max-w-2xl mx-auto bg-white dark:bg-gray-900 text-black dark:text-white p-8 rounded-2xl shadow-lg my-6">
 
   <a routerLink="/dashboard" class="mb-4 inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800">
-  ← Back to my space
-</a>
+    ← Back to my space
+  </a>
 
   <h2 class="text-2xl font-semibold mb-1">File a complaint</h2>
   <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">
@@ -54,10 +54,26 @@
       </div>
     </div>
 
+    <!-- Urgent -->
+    <div class="mb-6 rounded-lg border p-4"
+         [ngClass]="urgent ? 'border-red-400 bg-red-50 dark:bg-red-900/20' : 'border-gray-300 dark:border-gray-600'">
+      <label class="flex items-start gap-3 cursor-pointer">
+        <input type="checkbox" name="urgent" [(ngModel)]="urgent" class="mt-1 h-4 w-4" />
+        <span>
+          <span class="block text-sm font-bold">This is urgent</span>
+          <span class="block text-xs text-gray-600 dark:text-gray-300">
+            Your complaint goes straight to a human advisor with high priority, without the automatic assistant.
+            Please use this only when your situation cannot wait (you can have 2 urgent complaints open at a time).
+          </span>
+        </span>
+      </label>
+    </div>
+
     <button type="submit"
             [disabled]="reclamationForm.invalid || loading || !session.isLoggedIn()"
-            class="w-full text-white py-2 rounded transition bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">
-      {{ loading ? 'Sending...' : 'Submit complaint' }}
+            class="w-full text-white py-2 rounded transition disabled:opacity-50 disabled:cursor-not-allowed"
+            [ngClass]="urgent ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'">
+      {{ loading ? 'Sending...' : (urgent ? 'Submit urgent complaint' : 'Submit complaint') }}
     </button>
   </form>
 
@@ -66,11 +82,14 @@
     <p class="font-semibold">✅ Your complaint has been registered.</p>
     <p class="text-sm mt-1">Reference: <strong>{{ reclamationCreee.reference }}</strong></p>
     <p class="text-sm">{{ reclamationCreee.categorieLibelle }} · {{ reclamationCreee.sousCategorieLibelle }}</p>
-    <p class="text-sm">Status: {{ reclamationCreee.statut }}</p>
+    <p class="text-sm" *ngIf="reclamationCreee.statut === 'ESCALADEE_SUPPORT'">
+      It has been sent directly to a human advisor with high priority.
+    </p>
+    <p class="text-sm" *ngIf="reclamationCreee.statut !== 'ESCALADEE_SUPPORT'">Status: {{ reclamationCreee.statut }}</p>
     <a [routerLink]="['/reclamations', reclamationCreee.id, 'chat']"
-   class="inline-block mt-3 rounded bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700">
-  Talk to the assistant
-   </a>
+       class="inline-block mt-3 rounded bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700">
+      {{ reclamationCreee.statut === 'ESCALADEE_SUPPORT' ? 'Open my complaint' : 'Talk to the assistant' }}
+    </a>
   </div>
 
   <div *ngIf="errorMessage" class="mt-4 text-red-600 font-semibold text-center">

@@ -1,0 +1,59 @@
+<div class="max-w-5xl mx-auto p-6 bg-transparent min-h-screen">
+  <h1 class="text-3xl font-bold text-yellow-300 mb-6 text-center">
+    Guide Utilisateur - Application Hexabyte
+  </h1>
+
+  <br>
+  <br>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+    
+    <!-- SECTION IMAGE AVEC AGRANDISSEMENT -->
+    <div class="bg-white p-4 rounded-xl shadow-md border border-gray-200">
+      <h2 class="text-xl font-semibold mb-3 text-gray-700">Diagramme du Workflow</h2>
+      <div class="relative group cursor-pointer overflow-hidden rounded-lg" (click)="toggleImageZoom()">
+        <img [src]="imageSrc" alt="Workflow Hexabyte" class="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-105" />
+        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white font-medium">
+          🔍 Clic pour agrandir
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION MENU DÉROULANT (ACCORDÉON) -->
+    <div class="space-y-3">
+      <h2 class="text-xl font-semibold mb-3 text-blue-500">Étapes du Processus pour l'application :</h2>
+      
+      <div *ngFor="let step of steps; let i = index" class="border border-gray-200 rounded-lg bg-white overflow-hidden shadow-sm">
+        <button 
+          (click)="toggleStep(i)" 
+          class="w-full flex justify-between items-center p-4 text-left font-semibold text-gray-800 hover:bg-gray-50 transition-colors">
+          <span>{{ step.title }}</span>
+          <span class="text-xl transform transition-transform duration-200" [class.rotate-180]="step.isOpen">
+            ▼
+          </span>
+        </button>
+        
+        <div *ngIf="step.isOpen" class="p-4 bg-gray-50 border-t border-gray-100 text-gray-600 text-sm">
+          <ul class="list-disc pl-5 space-y-1">
+            <li *ngFor="let item of step.content">{{ item }}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- MODAL / LIGHTBOX POUR LOGO ET AGRANDISSEMENT IMAGE -->
+  <div *ngIf="isImageZoomed" 
+       class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 cursor-zoom-out"
+       (click)="toggleImageZoom()">
+    <div class="relative max-w-7xl max-h-[90vh] overflow-auto bg-white p-2 rounded-lg" (click)="$event.stopPropagation()">
+      <button 
+        (click)="toggleImageZoom()" 
+        class="absolute top-3 right-3 bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold z-10 shadow">
+        ✕
+      </button>
+      <img [src]="imageSrc" alt="Workflow Hexabyte Agrandie" class="w-full h-auto max-h-[85vh] object-contain rounded" />
+    </div>
+  </div>
+</div>

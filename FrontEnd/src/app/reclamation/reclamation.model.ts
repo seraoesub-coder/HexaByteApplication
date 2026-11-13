@@ -2,6 +2,7 @@
 export interface CreateReclamationRequest {
   sousCategorieId: number;
   description: string;          // 10 à 2000 caractères
+  urgent?: boolean;             // true = priorité HAUTE, transmise directement à un conseiller humain
 }
 
 export interface Reclamation {
