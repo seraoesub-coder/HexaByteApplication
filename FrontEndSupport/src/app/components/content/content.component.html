@@ -1,0 +1,104 @@
+<!-- Main Wrapper that toggles Fullscreen -->
+<div 
+  [ngClass]="{
+    'fixed inset-0 z-50 overflow-y-auto rounded-none p-6 bg-gray-100 dark:bg-gray-950': isFullScreen,
+    'container mx-auto py-6 px-4': !isFullScreen
+  }"
+  class="transition-all duration-300">
+
+  <!-- Top Header Box -->
+  <div class="w-full bg-blue-900 dark:bg-gray-900 p-6 sm:p-8 rounded-2xl shadow-lg transition-all duration-300 mb-6">
+    <div class="flex items-center justify-between text-white">
+      <div>
+        <p class="text-2xl font-bold">Espace Support / Agent Portal</p>
+        <p class="text-sm opacity-80 mt-1">Plateforme de gestion et de traitement des réclamations Hexabyte.</p>
+      </div>
+      <div class="flex items-center gap-4">
+        <span class="text-sm font-medium">{{ currentTime }}</span>
+        
+        <!-- Fullscreen Toggle Button -->
+        <button 
+          (click)="isFullScreen = !isFullScreen" 
+          class="px-3 py-1.5 bg-white/20 hover:bg-white/30 text-white rounded-lg text-sm font-medium transition flex items-center gap-1 cursor-pointer">
+          <span>{{ isFullScreen ? 'Exit Fullscreen' : 'Fullscreen' }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Single Unified Container: Support Agent Welcome & Activity Summary -->
+  <div class="w-full bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800 text-black dark:text-white">
+    
+    <!-- Agent Profile Welcome Bar -->
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between pb-6 mb-6 border-b border-gray-200 dark:border-gray-800 gap-4">
+      <div class="flex items-center gap-4">
+        <div class="w-14 h-14 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xl shadow-md border-2 border-blue-400">
+          SA
+        </div>
+        <div>
+          <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
+            Bienvenue, Agent Support 👋
+          </h2>
+          <p class="text-sm text-blue-600 dark:text-blue-400 font-semibold">
+            Niveau 2 - Assistance Technique & Support Client
+          </p>
+        </div>
+      </div>
+
+      <!-- Last Login Badge -->
+      <div class="bg-gray-50 dark:bg-gray-800 px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-right">
+        <p class="text-xs text-gray-500 dark:text-gray-400">Dernière connexion</p>
+        <p class="text-xs font-bold text-gray-800 dark:text-gray-200">Aujourd'hui à 08:30 (IP: 192.168.1.45)</p>
+      </div>
+    </div>
+
+    <!-- Agent Welcome Statement & Operational Guidelines -->
+    <div class="text-lg leading-relaxed space-y-4 mb-8">
+      <p>
+        Ravi de vous revoir sur votre console d'administration <strong>Hexabyte</strong>. Votre espace de travail est prêt pour la prise en charge des incidents techniques et le suivi des abonnés (ADSL, VDSL, Fibre optique & Offres Pro).
+      </p>
+      <p class="text-sm text-gray-600 dark:text-gray-300">
+        Assurez-vous de vérifier prioritairement les réclamations en attente d'affectation et les demandes nécessitant une intervention technique sur le terrain.
+      </p>
+    </div>
+
+    <!-- Quick Status Overview Cards Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      
+      <!-- Metric 1: Pending Tickets -->
+      <div class="bg-gray-50 dark:bg-gray-800 p-5 rounded-xl border-l-4 border-blue-500 flex items-center justify-between shadow-sm">
+        <div>
+          <p class="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold">Réclamations en attente</p>
+          <p class="text-2xl font-extrabold text-blue-600 dark:text-blue-400 mt-1">12</p>
+        </div>
+        <span class="text-2xl">⏳</span>
+      </div>
+
+      <!-- Metric 2: Assigned Technicians -->
+      <div class="bg-gray-50 dark:bg-gray-800 p-5 rounded-xl border-l-4 border-green-500 flex items-center justify-between shadow-sm">
+        <div>
+          <p class="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold">Techniciens actifs</p>
+          <p class="text-2xl font-extrabold text-green-600 dark:text-green-400 mt-1">8</p>
+        </div>
+        <span class="text-2xl">🛠️</span>
+      </div>
+
+      <!-- Metric 3: Resolved Today -->
+      <div class="bg-gray-50 dark:bg-gray-800 p-5 rounded-xl border-l-4 border-purple-500 flex items-center justify-between shadow-sm">
+        <div>
+          <p class="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold">Résolues aujourd'hui</p>
+          <p class="text-2xl font-extrabold text-purple-600 dark:text-purple-400 mt-1">24</p>
+        </div>
+        <span class="text-2xl">✅</span>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Separate Footer Section -->
+  <footer class="w-full bg-blue-900 text-white text-center py-6 mt-20 rounded-2xl shadow-lg transition-all duration-300">
+    <p class="text-xl">&copy; 2026 Hexabyte - Tous droits réservés.</p>
+  </footer>
+
+</div>

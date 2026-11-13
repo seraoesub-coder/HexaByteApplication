@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Service Écoute & Réclamations - Hexabyte</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center p-4 md:p-8">
+
+  <!-- Section Principale d'Écoute Client Hexabyte -->
+  <div class="max-w-6xl w-full bg-gradient-to-br from-blue-950 via-blue-900 to-gray-900 rounded-3xl p-6 md:p-10 border border-blue-800/50 shadow-2xl relative overflow-hidden">
+    
+    <!-- Effet de lueur d'arrière-plan bleu -->
+    <div class="absolute -top-24 -right-24 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl pointer-events-none"></div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+      
+      <!-- COLONNE GAUCHE : Texte de présentation & Fonctionnalités (7 colonnes) -->
+      <div class="lg:col-span-7 space-y-6">
+        
+        <!-- Badge Service Client -->
+        <div class="inline-flex items-center space-x-2 bg-blue-500/10 border border-blue-400/30 px-3.5 py-1.5 rounded-full">
+          <span class="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>
+          <span class="text-xs font-semibold text-blue-300 uppercase tracking-wider">Service d'écoute & assistance Hexabyte</span>
+        </div>
+
+        <!-- Titre principal -->
+        <h1 class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white leading-tight">
+          Votre voix compte, <br class="hidden sm:inline"/>
+          <span class="bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">Hexabyte reste à votre écoute.</span>
+        </h1>
+
+        <!-- Description globale -->
+        <p class="text-gray-300 text-sm md:text-base leading-relaxed">
+          Bienvenue sur le portail dédié au suivi de vos abonnements et à la résolution de vos réclamations en Tunisie. Nous avons conçu une expérience simplifiée et multi-canal pour répondre rapidement à tous vos besoins réseau et internet.
+        </p>
+
+        <!-- Les 3 Piliers du Support Hexabyte -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+          
+          <!-- Pilier 1 : Agent IA -->
+          <div class="bg-blue-900/40 border border-blue-700/40 p-4 rounded-2xl hover:border-blue-400/60 transition">
+            <div class="w-9 h-9 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-300 font-bold mb-2 text-lg">🤖</div>
+            <h3 class="font-bold text-white text-sm mb-1">Agent IA Instantané</h3>
+            <p class="text-xs text-gray-300 leading-snug">Guidage intelligent 24/7 pour diagnostiquer vos pannes et qualifier vos demandes en quelques secondes.</p>
+          </div>
+
+          <!-- Pilier 2 : Support Technique -->
+          <div class="bg-blue-900/40 border border-blue-700/40 p-4 rounded-2xl hover:border-blue-400/60 transition">
+            <div class="w-9 h-9 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-300 font-bold mb-2 text-lg">🎧</div>
+            <h3 class="font-bold text-white text-sm mb-1">Support dédié</h3>
+            <p class="text-xs text-gray-300 leading-snug">Nos téléconseillers prennent en charge vos dossiers de paiement, forfaits et ligne ADSL/Fibre.</p>
+          </div>
+
+          <!-- Pilier 3 : Visites Techniciens -->
+          <div class="bg-blue-900/40 border border-blue-700/40 p-4 rounded-2xl hover:border-blue-400/60 transition">
+            <div class="w-9 h-9 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-300 font-bold mb-2 text-lg">🛠️</div>
+            <h3 class="font-bold text-white text-sm mb-1">Visites sur le terrain</h3>
+            <p class="text-xs text-gray-300 leading-snug">Nos techniciens experts se déplacent chez vous partout en Tunisie pour réparer votre installation.</p>
+          </div>
+
+        </div>
+
+        <!-- Boutons d'action -->
+        <div class="pt-4 flex flex-wrap gap-4 items-center">
+          <a href="#reclamation-form" class="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl text-sm shadow-lg shadow-blue-600/30 transition flex items-center space-x-2">
+            <span>Déposer une réclamation</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+          </a>
+          <span class="text-xs text-gray-400 flex items-center space-x-1">
+            <span class="text-green-400">🟢</span>
+            <span>Prise en charge moyenne &lt; 24h</span>
+          </span>
+        </div>
+
+      </div>
+
+      <!-- COLONNE DROITE : Vidéo de 4 secondes (5 colonnes) -->
+      <div class="lg:col-span-5 relative">
+        <div class="relative rounded-2xl overflow-hidden border-2 border-blue-500/40 shadow-2xl bg-blue-950">
+          
+          <!-- Lecteur Vidéo en Boucle Infinie (Autoplay / Loop / Muted) -->
+          <video 
+            class="w-full h-72 md:h-96 object-cover"
+            autoplay 
+            loop 
+            muted 
+            playsinline>
+            <!-- Remplacez le chemin ci-dessous par l'emplacement de votre fichier vidéo -->
+            <source src="assets/videos/hexabyte-presentation.mp4" type="video/mp4">
+            Votre navigateur ne supporte pas la lecture de vidéos HTML5.
+          </video>
+
+          <!-- Overlay / Dégradé bleu sur la vidéo -->
+          <div class="absolute inset-0 bg-gradient-to-t from-blue-950/80 via-transparent to-transparent pointer-events-none"></div>
+
+          <!-- Label d'information sur la vidéo -->
+          <div class="absolute bottom-4 left-4 right-4 bg-gray-900/80 backdrop-blur-md p-3 rounded-xl border border-blue-500/30 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-blue-400 animate-ping"></span>
+              <span class="text-xs font-medium text-blue-200">Réseau & Assistance Hexabyte</span>
+            </div>
+            <span class="text-[10px] uppercase font-bold tracking-widest text-blue-400 bg-blue-950 px-2 py-0.5 rounded border border-blue-800">Tunisie</span>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</body>
+</html>

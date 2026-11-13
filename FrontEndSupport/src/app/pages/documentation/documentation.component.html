@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Service Écoute & Réclamations - Hexabyte</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center p-4 md:p-8">
+
+  <!-- Section Principale Hexabyte -->
+  <div class="max-w-5xl w-full bg-gradient-to-b from-blue-950 via-blue-900 to-gray-900 rounded-3xl p-6 md:p-10 border border-blue-800/50 shadow-2xl relative overflow-hidden">
+    
+    <!-- Effet de lueur en arrière-plan -->
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+    <!-- 1. EN-TÊTE & TEXTE EXPLICATIF -->
+    <div class="text-center max-w-3xl mx-auto space-y-4 mb-8">
+      <div class="inline-flex items-center space-x-2 bg-blue-500/10 border border-blue-400/30 px-3.5 py-1.5 rounded-full">
+        <span class="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>
+        <span class="text-xs font-semibold text-blue-300 uppercase tracking-wider">Service d'écoute & assistance Hexabyte</span>
+      </div>
+
+      <h1 class="text-3xl md:text-4xl font-extrabold text-white">
+        Votre voix compte, <span class="bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">Hexabyte reste à votre écoute</span>
+      </h1>
+
+      <p class="text-gray-300 text-sm md:text-base leading-relaxed">
+        Bienvenue sur le portail dédié au suivi de vos abonnements et à la résolution de vos réclamations en Tunisie. Nous mettons à votre disposition un accompagnement complet pour garantir la qualité de votre connexion.
+      </p>
+    </div>
+
+    <!-- 2. LES 3 PILIERS DU SUPPORT (Alignés horizontalement au-dessus de la vidéo) -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+      
+      <!-- Agent IA -->
+      <div class="bg-blue-900/40 border border-blue-700/40 p-4 rounded-2xl hover:border-blue-400/60 transition flex items-start space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-300 font-bold text-xl flex-shrink-0">🤖</div>
+        <div>
+          <h3 class="font-bold text-white text-sm mb-1">Agent IA Instantané</h3>
+          <p class="text-xs text-gray-300 leading-snug">Guidage intelligent 24/7 pour orienter vos réclamations et diagnostiquer vos pannes.</p>
+        </div>
+      </div>
+
+      <!-- Support Technique -->
+      <div class="bg-blue-900/40 border border-blue-700/40 p-4 rounded-2xl hover:border-blue-400/60 transition flex items-start space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-300 font-bold text-xl flex-shrink-0">🎧</div>
+        <div>
+          <h3 class="font-bold text-white text-sm mb-1">Support Dédié</h3>
+          <p class="text-xs text-gray-300 leading-snug">Prise en charge personnalisée de vos factures, options et lignes ADSL/Fibre.</p>
+        </div>
+      </div>
+
+      <!-- Visites Techniciens -->
+      <div class="bg-blue-900/40 border border-blue-700/40 p-4 rounded-2xl hover:border-blue-400/60 transition flex items-start space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-300 font-bold text-xl flex-shrink-0">🛠️</div>
+        <div>
+          <h3 class="font-bold text-white text-sm mb-1">Visites du Terrain</h3>
+          <p class="text-xs text-gray-300 leading-snug">Intervention rapide de nos professionnels qualifiés directement chez vous en Tunisie.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 3. GRANDE VIDÉO IMMERSIVE (Située sous le texte et les piliers) -->
+    <div class="relative rounded-2xl overflow-hidden border-2 border-blue-500/40 shadow-2xl bg-blue-950 w-full group">
+      
+      <!-- Lecteur Vidéo Pleine Largeur (Boucle 4s) -->
+      <video 
+        class="w-full h-64 md:h-80 lg:h-96 object-cover"
+        autoplay 
+        loop 
+        muted 
+        playsinline>
+        <!-- Remplacez par le lien de votre vidéo de 4 secondes -->
+        <source src="assets/videos/HexaByteIntro.mp4" type="video/mp4">
+        Votre navigateur ne supporte pas la vidéo.
+      </video>
+
+      <!-- Gradient sombre sur le bas de la vidéo -->
+      <div class="absolute inset-0 bg-gradient-to-t from-blue-950/90 via-transparent to-transparent pointer-events-none"></div>
+
+      <!-- Label flottant d'information sur la vidéo -->
+      <div class="absolute bottom-4 left-4 right-4 md:left-6 md:right-6 bg-gray-900/80 backdrop-blur-md p-4 rounded-xl border border-blue-500/30 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div class="flex items-center space-x-3">
+          <span class="w-3 h-3 rounded-full bg-blue-400 animate-ping"></span>
+          <span class="text-xs md:text-sm font-semibold text-blue-200">Hexabyte Tunisie — Assistance réseau & proximité client</span>
+        </div>
+        <span class="text-xs font-bold uppercase tracking-widest text-blue-400 bg-blue-950/90 px-3 py-1 rounded-lg border border-blue-800">
+          En direct 24/7
+        </span>
+      </div>
+
+    </div>
+
+  </div>
+
+</body>
+</html>
+

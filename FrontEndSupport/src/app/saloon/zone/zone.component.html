@@ -1,0 +1,275 @@
+<div class="p-6 bg-gray-950 min-h-screen text-white font-sans space-y-6">
+  
+  <!-- ==================== BANNIÈRE D'ACCUEIL & AGENT HEADER ==================== -->
+  <div class="w-full bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-xl relative overflow-hidden">
+    <!-- Lueur décorative Hexabyte -->
+    <div class="absolute -top-10 -right-10 w-64 h-64 bg-blue-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+    <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 relative z-10">
+      
+      <!-- Profil Agent & Message d'accueil -->
+      <div class="flex items-center gap-4">
+        <div class="relative">
+          <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-700 to-blue-500 flex items-center justify-center text-white shadow-lg border-2 border-blue-400">
+            <svg class="w-9 h-9" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path>
+            </svg>
+          </div>
+          <span class="absolute bottom-0 right-0 w-4 h-4 bg-green-500 border-2 border-gray-900 rounded-full" title="En ligne"></span>
+        </div>
+
+        <div>
+          <h1 class="text-2xl font-bold text-white">Ravi de vous revoir, {{ agentName }} 👋</h1>
+          <p class="text-sm text-blue-400 font-medium mt-0.5">{{ agentRole }} — Portail Hexabyte Admin</p>
+          <p class="text-xs text-gray-400 mt-1">
+            Zone de supervision active • Synchronisé avec les réclamations backend.
+          </p>
+        </div>
+      </div>
+
+      <!-- Bloc Droite : Horloge 12h & Notifications -->
+      <div class="flex items-center gap-4 w-full lg:w-auto justify-between lg:justify-end">
+        
+        <!-- Horloge Numérique 12h -->
+        <div class="bg-gray-800/80 border border-gray-700/60 px-4 py-2.5 rounded-xl shadow-inner flex items-center gap-2.5">
+          <svg class="w-5 h-5 text-blue-400 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <div class="flex flex-col">
+            <span class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Heure Locale</span>
+            <span class="text-sm font-mono font-bold text-white">{{ currentTimeFormatted }}</span>
+          </div>
+        </div>
+
+        <!-- Menu Notifications -->
+        <div class="relative">
+          <button 
+            (click)="showNotifications = !showNotifications"
+            class="p-3 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-200 rounded-xl transition relative cursor-pointer focus:outline-none"
+          >
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+            </svg>
+            <span *ngIf="unreadNotificationsCount > 0" class="absolute -top-1 -right-1 w-5 h-5 bg-blue-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center animate-bounce">
+              {{ unreadNotificationsCount }}
+            </span>
+          </button>
+
+          <!-- Dropdown Panneau -->
+          <div *ngIf="showNotifications" class="absolute right-0 mt-3 w-80 sm:w-96 bg-gray-900 border border-gray-800 rounded-2xl shadow-2xl z-50 overflow-hidden">
+            <div class="p-4 border-b border-gray-800 flex items-center justify-between">
+              <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                🔔 Notifications <span class="text-xs text-blue-400 font-normal">({{ unreadNotificationsCount }})</span>
+              </h3>
+              <button (click)="markAllAsRead()" class="text-xs text-gray-400 hover:text-blue-400 transition cursor-pointer">Tout marquer comme lu</button>
+            </div>
+            <div class="max-h-72 overflow-y-auto divide-y divide-gray-800/50">
+              <div *ngFor="let notif of notifications" [ngClass]="notif.unread ? 'bg-blue-950/20' : 'bg-transparent'" class="p-3.5 hover:bg-gray-800/60 transition flex items-start gap-3">
+                <span class="w-2 h-2 mt-2 rounded-full shrink-0" [ngClass]="notif.unread ? 'bg-blue-500' : 'bg-gray-600'"></span>
+                <div class="flex-1">
+                  <p class="text-xs text-gray-200 font-medium">{{ notif.message }}</p>
+                  <span class="text-[10px] text-gray-400 mt-1 block">{{ notif.time }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==================== TABLEAU DES RÉCLAMATIONS & CLIENTS ==================== -->
+  <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-xl space-y-6">
+    
+    <!-- Barre de filtres et recherche -->
+    <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 pb-6 border-b border-gray-800">
+      <div>
+        <h2 class="text-xl font-bold text-white flex items-center gap-2">
+          📋 Registre des Réclamations Backend (Zone)
+        </h2>
+        <p class="text-xs text-gray-400 mt-0.5">Cliquez sur le nom d'un client pour consulter sa fiche signalétique.</p>
+      </div>
+
+      <div class="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
+        <!-- Recherche -->
+        <div class="relative w-full sm:w-64">
+          <input 
+            type="text"
+            [(ngModel)]="searchTerm"
+            placeholder="Rechercher client, référence..."
+            class="w-full bg-gray-800 border border-gray-700 rounded-xl pl-9 pr-4 py-2 text-xs text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition"
+          />
+          <svg class="w-4 h-4 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+        </div>
+
+        <!-- Filtre de statut backend -->
+        <select 
+          [(ngModel)]="selectedStatusFilter"
+          class="bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 w-full sm:w-auto"
+        >
+          <option value="TOUS">Tous les statuts</option>
+          <option value="OUVERTE">Ouverte</option>
+          <option value="EN_COURS_IA">En cours IA</option>
+          <option value="ESCALADEE_SUPPORT">Escaladée Support</option>
+          <option value="RESOLUE_PAR_IA">Résolue par IA</option>
+          <option value="CLOTUREE">Clôturée</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Tableau de données -->
+    <div class="overflow-x-auto">
+      <div *ngIf="loading" class="text-center py-10 text-gray-400 text-xs">
+        Chargement des données du serveur...
+      </div>
+
+      <div *ngIf="errorMessage" class="bg-red-500/10 border border-red-500/30 text-red-400 p-4 rounded-xl text-xs mb-4">
+        {{ errorMessage }}
+      </div>
+
+      <table *ngIf="!loading" class="w-full text-left border-collapse">
+        <thead>
+          <tr class="border-b border-gray-800 text-xs text-gray-400 uppercase tracking-wider">
+            <th class="py-3 px-4">Référence</th>
+            <th class="py-3 px-4">Client (Cliquer)</th>
+            <th class="py-3 px-4">Catégorie / Incident</th>
+            <th class="py-3 px-4">Priorité</th>
+            <th class="py-3 px-4">Statut</th>
+            <th class="py-3 px-4">Date Création</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-800/60 text-xs">
+          
+          <tr *ngFor="let item of filteredItems" class="hover:bg-gray-800/40 transition">
+            
+            <!-- Référence -->
+            <td class="py-3.5 px-4 font-mono font-bold text-blue-400">
+              {{ item.reference }}
+            </td>
+
+            <!-- NOM DU CLIENT CLIQUABLE -->
+            <td class="py-3.5 px-4">
+              <span 
+                (click)="openClientDetails(item.client, item.reference)"
+                class="font-semibold text-blue-400 hover:text-blue-300 hover:underline cursor-pointer flex items-center gap-1.5"
+                title="Cliquer pour afficher la fiche client"
+              >
+                👤 {{ item.client?.prenom }} {{ item.client?.nom }}
+              </span>
+              <span class="text-[10px] text-gray-400 font-mono">{{ item.client?.numeroClient }}</span>
+            </td>
+
+            <!-- Incident -->
+            <td class="py-3.5 px-4 text-gray-300">
+              <div class="font-medium">{{ item.categorieLibelle }}</div>
+              <div class="text-[11px] text-gray-400 truncate max-w-xs">{{ item.sousCategorieLibelle }}</div>
+            </td>
+
+            <!-- Priorité -->
+            <td class="py-3.5 px-4">
+              <span [ngClass]="{
+                'text-red-400 font-bold': item.priorite === 'HAUTE',
+                'text-amber-400 font-medium': item.priorite === 'NORMALE',
+                'text-gray-400': item.priorite === 'BASSE'
+              }">
+                {{ item.priorite }}
+              </span>
+            </td>
+
+            <!-- Statut -->
+            <td class="py-3.5 px-4">
+              <span class="px-2.5 py-1 rounded-lg border text-[11px] font-semibold" [ngClass]="{
+                'bg-amber-500/10 text-amber-400 border-amber-500/20': item.statut === 'OUVERTE',
+                'bg-blue-500/10 text-blue-400 border-blue-500/20': item.statut === 'EN_COURS_IA',
+                'bg-purple-500/10 text-purple-400 border-purple-500/20': item.statut === 'ESCALADEE_SUPPORT',
+                'bg-green-500/10 text-green-400 border-green-500/20': item.statut === 'RESOLUE_PAR_IA',
+                'bg-gray-800 text-gray-400 border-gray-700': item.statut === 'CLOTUREE'
+              }">
+                {{ item.statut }}
+              </span>
+            </td>
+
+            <!-- Date -->
+            <td class="py-3.5 px-4 text-gray-400">
+              {{ item.dateCreation | date:'dd/MM/yyyy HH:mm' }}
+            </td>
+
+          </tr>
+
+          <tr *ngIf="filteredItems.length === 0">
+            <td colspan="6" class="text-center py-8 text-gray-500">
+              Aucune réclamation trouvée pour ce filtre.
+            </td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- ==================== MODALE FICHE CLIENT ==================== -->
+  <div *ngIf="isClientModalOpen && selectedClient" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-gray-900 border border-gray-800 p-6 rounded-2xl w-full max-w-lg shadow-2xl text-white space-y-5">
+      
+      <!-- En-tête Modale -->
+      <div class="flex justify-between items-center pb-4 border-b border-gray-800">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-blue-600/20 border border-blue-500/40 flex items-center justify-center text-blue-400">
+            👤
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-white">Fiche Abonnée Hexabyte</h3>
+            <p class="text-xs text-blue-400 font-mono">{{ selectedClient.numeroClient }}</p>
+          </div>
+        </div>
+        <button (click)="closeClientModal()" class="text-gray-400 hover:text-white text-xl cursor-pointer">&times;</button>
+      </div>
+
+      <!-- Informations client -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs bg-gray-800/40 p-4 rounded-xl border border-gray-800">
+        <div>
+          <span class="text-gray-400 block">Nom & Prénom</span>
+          <span class="font-bold text-white text-sm">{{ selectedClient.nom }} {{ selectedClient.prenom }}</span>
+        </div>
+        <div>
+          <span class="text-gray-400 block">N° de Téléphone</span>
+          <span class="font-bold text-green-400 text-sm">{{ selectedClient.telephone }}</span>
+        </div>
+        <div>
+          <span class="text-gray-400 block">Adresse Email</span>
+          <span class="font-medium text-white">{{ selectedClient.email }}</span>
+        </div>
+        <div>
+          <span class="text-gray-400 block">ID Interne Client</span>
+          <span class="font-mono text-gray-300">#{{ selectedClient.clientId }}</span>
+        </div>
+        <div class="sm:col-span-2 pt-2 border-t border-gray-700/50">
+          <span class="text-gray-400 block">📍 Adresse d'installation de la ligne</span>
+          <span class="font-medium text-amber-300 text-sm">{{ selectedClient.adresseInstallation }}</span>
+        </div>
+      </div>
+
+      <!-- Ticket lié -->
+      <div class="text-[11px] text-gray-400 bg-blue-950/20 border border-blue-500/30 p-3 rounded-lg flex items-center justify-between">
+        <span>Référence Ticket lié : <strong class="text-blue-400 font-mono">{{ selectedReclamationRef }}</strong></span>
+        <span class="text-blue-400 font-semibold">Hexabyte Support</span>
+      </div>
+
+      <!-- Bouton Fermer -->
+      <div class="flex justify-end pt-3 border-t border-gray-800">
+        <button 
+          (click)="closeClientModal()" 
+          class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold cursor-pointer transition">
+          Fermer la fiche
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</div>
