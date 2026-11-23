@@ -23,7 +23,6 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
     : req;
 
-  
   return next(requete).pipe(
     catchError((err: HttpErrorResponse) => {
       if (err.status === 403 && token && !session.isLoggedIn()) {

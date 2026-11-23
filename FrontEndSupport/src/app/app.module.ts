@@ -37,7 +37,9 @@ import { FolderIconComponent } from './components/docs/icons/folder-icon/folder-
 import { AngularIconComponent } from './components/docs/icons/angular-icon/angular-icon.component';
 import { AreaComponent } from './saloon/area/area.component';
 import { ZoneComponent } from './saloon/zone/zone.component';
-import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { authInterceptor } from './core/interceptors/auth.interceptor';
+import { HttpClientModule, provideHttpClient, withInterceptors } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -78,7 +80,7 @@ import { HttpClientModule } from '@angular/common/http';
     //AreaComponent,
   ],
   imports: [BrowserModule, AppRoutingModule, HttpClientModule ],// 👈 2. Ajoutez-le ici pour rendre HttpClient disponible partout],
-  providers: [],
+  providers: [provideHttpClient(withInterceptors([authInterceptor]))],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

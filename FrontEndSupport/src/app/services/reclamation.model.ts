@@ -16,6 +16,14 @@ export interface CreateReclamationRequest {
 }
 
 
+export interface CarnetEntree {
+  id?: number;
+  contenu: string;
+  automatique: boolean;
+  dateCreation?: string;
+  auteur?: string;
+}
+
 export interface Reclamation {
   id: number;
   reference: string;
@@ -28,7 +36,30 @@ export interface Reclamation {
   sousCategorieLibelle: string;
   dateCreation: string;
   dateMiseAJour: string;
-  client?: Client; // Données du client rattachées si fournies par le backend support
+  client?: Client; 
+}
+
+export interface SupportReclamationResponse {
+  client: {
+    clientId?: number;
+    numeroClient?: string;
+    nom: string;
+    prenom: string;
+    telephone?: string;
+    email?: string;
+    adresseInstallation?: string;
+  };
+  reclamation: {
+    id: number;
+    reference: string;
+    statut: string;
+    priorite: string;
+    description: string;
+    categorieCode:string;
+    categorieLibelle: string;
+    sousCategorieLibelle: string;
+    dateCreation: string;
+  };
 }
 
 export interface Page<T> {
