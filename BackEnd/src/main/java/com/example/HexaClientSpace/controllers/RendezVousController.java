@@ -15,8 +15,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/rendezvous")
-@PreAuthorize("hasRole('CLIENT')")
+@RequestMapping("/api/rendez-vous")
+@PreAuthorize("hasAnyRole('CLIENT', 'AGENT_SUPPORT', 'ADMIN')")
+
 public class RendezVousController {
 
     private final RendezVousService rendezVousService;
@@ -45,15 +46,29 @@ public class RendezVousController {
     public RendezVousResponse annuler(@PathVariable Long id) {
         return rendezVousService.annuler(currentUser.getId(), id);
     }
-
+/*
     @GetMapping
     public Page<RendezVousResponse> mesRendezVous(
             @PageableDefault(size = 10, sort = "dateCreation", direction = Sort.Direction.DESC) Pageable pageable) {
         return rendezVousService.lister(currentUser.getId(), pageable);
     }
+ */
 
+    
     @GetMapping("/{id}")
     public RendezVousResponse detail(@PathVariable Long id) {
         return rendezVousService.obtenir(currentUser.getId(), id);
+    }
+
+    @GetMapping
+    public Page<RendezVousResponse> mesRendezVous(
+            @PageableDefault(size = 10, sort = "dateCreation", direction = Sort.Direction.DESC) Pageable pageable) {
+            return rendezVousService.listerPourUtilisateur(currentUser.getId(), pageable);
+    }    
+
+    @PostMapping("/{id}/realisation")
+    @PreAuthorize("hasAnyRole('AGENT_SUPPORT', 'ADMIN')")
+    public RendezVousResponse realiser(@PathVariable Long id) {
+        return rendezVousService.realiser(currentUser.getId(), id);
     }
 }

@@ -12,8 +12,17 @@ import com.example.HexaClientSpace.repository.ClientRepository;
 import com.example.HexaClientSpace.repository.ReclamationRepository;
 import com.example.HexaClientSpace.repository.RendezVousRepository;
 import com.example.HexaClientSpace.repository.TechnicienRepository;
+import com.example.HexaClientSpace.security.CurrentUser;
+
+import jakarta.persistence.EntityNotFoundException;
+
+import org.springframework.security.core.Authentication;
+
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,8 +35,17 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.concurrent.ThreadLocalRandom;
+
 @Service
 public class RendezVousService {
+
+    private BigDecimal genererPrixAleatoire(BigDecimal min, BigDecimal max) {
+        double randomVal = ThreadLocalRandom.current().nextDouble(min.doubleValue(), max.doubleValue());
+        return BigDecimal.valueOf(randomVal).setScale(2, RoundingMode.HALF_UP);
+    }
 
     /** Créneaux d'une heure, espacés d'au moins 2 h : deux créneaux ne se chevauchent jamais. */
     private static final List<LocalTime> CRENEAUX = List.of(
@@ -81,6 +99,10 @@ public class RendezVousService {
         rdv.setClient(client);
         rdv.setReclamation(reclamation);
         rdv.setAdresse(adresse.trim());
+        
+        BigDecimal prix = genererPrixAleatoire(new BigDecimal("20.00"), new BigDecimal("50.00"));
+        rdv.setPrix(genererPrixAleatoire(new BigDecimal("20.00"), new BigDecimal("150.00")));
+
         rdv.setMotif(request == null || request.motif() == null ? null : request.motif().trim());
         rdv.setDateHeure(proposerCreneau());
         rdv.setDureeMinutes(DUREE_MINUTES);
@@ -178,4 +200,44 @@ public class RendezVousService {
                 .orElseThrow(() -> new IllegalStateException(
                         "Aucun profil client rattaché à cet utilisateur."));
     }
+
+    private boolean isSupportOrAdmin() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null) {
+            return false;
+        }
+        return auth.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(role -> "ROLE_AGENT_SUPPORT".equals(role) || "ROLE_ADMIN".equals(role));
+    }
+
+    @Transactional(readOnly = true)
+    public Page<RendezVousResponse> listerPourUtilisateur(Long userId, Pageable pageable) {
+        if (isSupportOrAdmin()) {
+            return rendezVousRepository.findAllWithDetails(pageable)
+                    .map(RendezVousResponse::from);
+        }
+        return lister(userId, pageable);
+    }
+
+    @Transactional
+    public RendezVousResponse realiser(Long userId, Long rdvId) {
+        RendezVous rdv = rendezVousRepository.findDetailById(rdvId) // ou findById(rdvId)
+                .orElseThrow(() -> new EntityNotFoundException("Rendez-vous introuvable : " + rdvId));
+
+        if (rdv.getStatut() == StatutRendezVous.ANNULE) {
+            throw new IllegalStateException("Impossible de marquer comme réalisé un rendez-vous annulé.");
+        }
+        if (rdv.getStatut() == StatutRendezVous.REALISE) {
+            return RendezVousResponse.from(rdv);
+        }
+        if (rdv.getStatut() != StatutRendezVous.CONFIRME) {
+            throw new IllegalStateException("Seul un rendez-vous confirmé peut être marqué comme réalisé.");
+        }
+
+        rdv.setStatut(StatutRendezVous.REALISE);
+        RendezVous saved = rendezVousRepository.save(rdv);
+        return RendezVousResponse.from(saved);
+    }
+
 }

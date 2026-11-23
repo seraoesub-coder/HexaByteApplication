@@ -15,7 +15,6 @@ import java.util.Optional;
 public interface ReclamationRepository extends JpaRepository<Reclamation, Long> {
 
     // ----- Côté client -----
-
     @Query(value = "select r from Reclamation r join fetch r.sousCategorie s join fetch s.categorie "
                  + "where r.client.id = :clientId",
            countQuery = "select count(r) from Reclamation r where r.client.id = :clientId")

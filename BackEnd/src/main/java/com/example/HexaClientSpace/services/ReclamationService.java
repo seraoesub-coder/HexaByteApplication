@@ -14,8 +14,17 @@ import com.example.HexaClientSpace.repository.ClientRepository;
 import com.example.HexaClientSpace.repository.HistoriqueStatutRepository;
 import com.example.HexaClientSpace.repository.ReclamationRepository;
 import com.example.HexaClientSpace.repository.SousCategorieRepository;
+import com.example.HexaClientSpace.dto.AnnulerReclamationRequest;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+
+import jakarta.persistence.EntityNotFoundException;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -120,6 +129,32 @@ public class ReclamationService {
                 "Le client confirme que le problème est résolu.");
         return ReclamationResponse.from(reclamation);
     }
+
+        @Transactional
+        public ReclamationResponse annulerReclamation(Long reclamationId, Long currentUserId) {
+        Reclamation reclamation = reclamationRepository.findDetailById(reclamationId)
+                .orElseThrow(() -> new RessourceIntrouvableException("Réclamation introuvable."));
+
+        boolean isClientOwner = clientRepository.findByUserId(currentUserId)
+                .map(client -> reclamation.getClient().getId().equals(client.getId()))
+                .orElse(false);
+
+        if (!isClientOwner) {
+                boolean isStaff = SecurityContextHolder.getContext().getAuthentication() != null
+                        && SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+                                .map(GrantedAuthority::getAuthority)
+                                .anyMatch(role -> "ROLE_AGENT_SUPPORT".equals(role) || "ROLE_ADMIN".equals(role));
+                if (!isStaff) {
+                throw new RessourceIntrouvableException("Réclamation introuvable.");
+                }
+        }
+
+        ActeurStatut acteur = isClientOwner ? ActeurStatut.CLIENT : ActeurStatut.SUPPORT;
+        String message = isClientOwner ? "Réclamation annulée par le client." : "Réclamation annulée par le support.";
+
+        statutService.changer(reclamation, StatutReclamation.ANNULEE, acteur, message);
+        return ReclamationResponse.from(reclamation);
+        }
 
     @Transactional(readOnly = true)
     public List<HistoriqueStatutResponse> historique(Long userId, Long reclamationId) {

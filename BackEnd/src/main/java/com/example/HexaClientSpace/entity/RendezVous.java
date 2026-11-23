@@ -2,6 +2,7 @@ package com.example.HexaClientSpace.entity;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -53,6 +54,10 @@ public class RendezVous {
     @Column(length = 255)
     private String motif;
 
+    @Column(name = "prix", precision = 10, scale = 2)
+    private BigDecimal prix;
+
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 15)
     private StatutRendezVous statut = StatutRendezVous.PROPOSE;
@@ -93,6 +98,13 @@ public class RendezVous {
 
     public String getMotif() { return motif; }
     public void setMotif(String motif) { this.motif = motif; }
+
+     public BigDecimal getPrix() {
+        return prix;
+    }
+    public void setPrix(BigDecimal prix) {
+        this.prix = prix;
+    }
 
     public StatutRendezVous getStatut() { return statut; }
     public void setStatut(StatutRendezVous statut) { this.statut = statut; }

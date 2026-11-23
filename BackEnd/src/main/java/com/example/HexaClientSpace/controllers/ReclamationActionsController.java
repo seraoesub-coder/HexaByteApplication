@@ -3,9 +3,13 @@ package com.example.HexaClientSpace.controllers;
 import com.example.HexaClientSpace.dto.EscaladeRequest;
 import com.example.HexaClientSpace.dto.HistoriqueStatutResponse;
 import com.example.HexaClientSpace.dto.ReclamationResponse;
+import com.example.HexaClientSpace.dto.AnnulerReclamationRequest;
+
 import com.example.HexaClientSpace.security.CurrentUser;
 import com.example.HexaClientSpace.services.ReclamationService;
 import jakarta.validation.Valid;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,10 +36,17 @@ public class ReclamationActionsController {
                 request == null ? null : request.motif());
     }
 
-    /** Le client confirme que l'agent IA a résolu son problème. */
+    /** Le client confirme que l'agent IA a résolu son problème */
     @PostMapping("/resolution")
     public ReclamationResponse declarerResolue(@PathVariable Long reclamationId) {
         return reclamationService.declarerResolue(currentUser.getId(), reclamationId);
+    }
+
+    @PostMapping("/annulation")
+    @PreAuthorize("hasAnyRole('CLIENT', 'AGENT_SUPPORT', 'ADMIN')")
+    public ResponseEntity<ReclamationResponse> annuler(@PathVariable Long reclamationId) {
+        ReclamationResponse response = reclamationService.annulerReclamation(reclamationId, currentUser.getId());
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/historique")
